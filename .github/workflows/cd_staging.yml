@@ -23,6 +23,7 @@ jobs:
       - name: SSH into VM and deploy
         run: |
           ssh -i ~/.ssh/id_rsa_gcp -t ${{ secrets.SSH_USER_STAGING }}@${{ secrets.SSH_HOST_STAGING }}
+          whoami
           pwd
           ls
           cd ~/turbo-cicd || git clone https://github.com/manan1000/turbo-cicd.git ~/turbo-cicd
