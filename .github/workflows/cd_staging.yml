@@ -15,8 +15,13 @@ jobs:
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/github-actions-key
-          chmod 600 ~/.ssh/github-actions-key
-          ssh-keyscan ${{ secrets.SSH_HOST_STAGING }}
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa_gcp
+          chmod 600 ~/.ssh/id_rsa_gcp
+          ssh-keyscan ${{ secrets.SSH_HOST_STAGING }} >> ~/.ssh/known_hosts
+
+      
+      - name: SSH into VM and deploy
+        run: |
+          ssh -i ~/.ssh/id_rsa_gcp -t ${{ secrets.SSH_USER_STAGING }}@${{ secrets.SSH_HOST_STAGING }}
 
     
