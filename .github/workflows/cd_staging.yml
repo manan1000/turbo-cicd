@@ -25,6 +25,7 @@ jobs:
           ssh -i ~/.ssh/id_rsa_gcp -t ${{ secrets.SSH_USER_STAGING }}@${{ secrets.SSH_HOST_STAGING }} << 'EOF'
             cd ~/turbo-cicd || git clone https://github.com/manan1000/turbo-cicd.git ~/turbo-cicd
             cd ~/turbo-cicd
+            git pull
             export NVM_DIR=~/.nvm
             source ~/.nvm/nvm.sh
             pnpm install
