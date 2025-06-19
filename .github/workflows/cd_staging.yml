@@ -1,0 +1,22 @@
+name: Deploy to GCP STAGING VM
+
+on:
+  push:
+    branch:
+      - main
+
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+
+    steps:
+      name: Setup SSH
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/github-actions-key
+        chmod 600 ~/.ssh/github-actions-key
+        ssh-keyscan -H ${{ secrets.SSH_HOST }}
+
+    
