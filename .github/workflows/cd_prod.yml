@@ -1,0 +1,44 @@
+name: Deploy to GCP PROD VM
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to deploy (should be "production")'
+        required: true
+        default: production
+
+jobs:
+  deploy:
+    if: github.ref == 'refs/heads/production'
+    runs-on: ubuntu-latest
+
+
+    steps:
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa_gcp
+          chmod 600 ~/.ssh/id_rsa_gcp
+          ssh-keyscan ${{ secrets.SSH_HOST_PROD }} >> ~/.ssh/known_hosts
+
+      
+      - name: SSH into VM and deploy
+        run: |
+          ssh -i ~/.ssh/id_rsa_gcp -t ${{ secrets.SSH_USER_PROD }}@${{ secrets.SSH_HOST_PROD }} << 'EOF'
+            cd ~/turbo-cicd || git clone https://github.com/manan1000/turbo-cicd.git ~/turbo-cicd
+            cd ~/turbo-cicd
+            git pull origin production
+            export NVM_DIR=~/.nvm
+            source ~/.nvm/nvm.sh
+            pnpm install
+            pnpm run build
+            cd apps/http-server
+            pm2 restart http-server
+            cd ../ws-server
+            pm2 restart ws-server
+            cd ../web
+            pm2 restart fe-server
+          EOF
+
+    
